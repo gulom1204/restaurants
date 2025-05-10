@@ -243,3 +243,42 @@ func DeleteRestaurants(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Все рестораны удалены и последовательность сброшена"})
 }
+
+func GetCategories(c *gin.Context) {
+	var categories []models.Category
+	db, err := store.InitDB()
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := db.Find(&categories).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"categories": categories})
+}
+
+func DeleteCategories(c *gin.Context) {
+	db, err := store.InitDB()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := db.Where("1 = 1").Delete(&models.MenuItem{}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if err := db.Where("1 = 1").Delete(&models.Category{}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := db.Exec("ALTER SEQUENCE restaurants_id_seq RESTART WITH 1").Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка сброса последовательности"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "All categories was deleted"})
+}

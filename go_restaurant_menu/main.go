@@ -30,7 +30,7 @@ func main() {
 
 	// Определение открытых маршрутов
 	r.GET("/", views.HomePage)
-	r.POST("/register-user", func(c *gin.Context) {
+	r.POST("/sign_up", func(c *gin.Context) {
 		views.RegisterUser(c, "admin")
 	})
 	r.POST("/login", views.Login)
@@ -46,7 +46,9 @@ func main() {
 		adminGroup.POST("/menu-items", views.AddMenuItem)
 		adminGroup.POST("/add-categories", views.AddCategories)
 		adminGroup.GET("/all-restaurants", views.Getrestaurants)
+		adminGroup.GET("/all-categories", views.GetCategories)
 		adminGroup.DELETE("/delete-restaurants", views.DeleteRestaurants)
+		adminGroup.DELETE("/delete-categories", views.DeleteCategories)
 	}
 
 	// Запуск сервера на порту 8080
