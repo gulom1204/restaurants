@@ -7,6 +7,7 @@ import (
 	"go_restaurant_menu/views"
 	"log"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -28,12 +29,25 @@ func main() {
 	// Создание нового экземпляра Gin
 	r := gin.Default()
 
+	// Настройка CORS
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		AllowCredentials: true,
+	}))
+
 	// Определение открытых маршрутов
 	r.GET("/", views.HomePage)
 	r.POST("/sign_up", func(c *gin.Context) {
 		views.RegisterUser(c, "admin")
 	})
 	r.POST("/login", views.Login)
+
+	// Публичные API endpoints для фронтенда
+	r.GET("/api/menu", views.GetPublicMenu)
+	r.GET("/api/categories", views.GetPublicCategories)
+	r.GET("/api/restaurants", views.GetPublicRestaurants)
 
 	// Защищённые маршруты для администраторов
 	adminGroup := r.Group("/admin")
